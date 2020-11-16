@@ -1,0 +1,17 @@
+Matrix Multiplication Method 1:
+row= 3	col= 3
+30.000000	36.000000	42.000000	
+66.000000	81.000000	96.000000	
+102.000000	126.000000	150.000000	
+Number of threads: 3
+Seconds taken: 0
+Microseconds taken: 639
+
+Matrix Multiplication Method 2:
+row= 3	col= 3
+30.000000	36.000000	42.000000	
+66.000000	81.000000	96.000000	
+102.000000	126.000000	150.000000	
+Number of threads: 9
+Seconds taken: 0
+Microseconds taken: 592

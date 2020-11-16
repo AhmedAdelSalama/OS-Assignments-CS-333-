@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1605507234 source:/home/ahmedadel/Documents/assignments/Threads/main.c
+	<stdio.h>
+	<stdlib.h>
+	<pthread.h>
+	<sys/time.h>
+

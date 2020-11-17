@@ -43,6 +43,11 @@ void readDimensions(FILE *input, int *row, int *col);
 /*reads matrix elements*/
 void readMatrix(FILE *input, int row, int col, double *mat[]);
 
+
+
+
+
+
 int main(int argc, char *argv[])
 {
     /*if the argv contains i/p and o/p files, open those files.*/
@@ -117,13 +122,15 @@ int main(int argc, char *argv[])
 
     /*create threads*/
     int count =0 , threadsNum = row1*col2;
+    struct dimensions *d[threadsNum];
+    int structCount =0;
     pthread_t threads_2[threadsNum];
     for(int i =0; i <row1 ; i++){
         for(int j = 0; j <col2; j++){
             /*dimensions struct to hold the index of the element to be computed*/
-            struct dimensions *d = (struct dimensions *)malloc(sizeof(struct dimensions));
-            d->row1 = i; d->col2 = j;
-            if(pthread_create(&threads_2[count++], NULL, method_2, (void*)d)){
+            d[structCount] = (struct dimensions *)malloc(sizeof(struct dimensions));
+            d[structCount]->row1 = i; d[structCount]->col2 = j;
+            if(pthread_create(&threads_2[count++], NULL, method_2, (void*)d[structCount++])){
                 printf("Cannot create thread\n");
                 exit(1);
             }
@@ -132,11 +139,13 @@ int main(int argc, char *argv[])
     /*join threads and get the value out of each thread*/
     double res2[row1][col2];
     count =0;
+    structCount = 0;
+    struct element *temp[threadsNum];
     for(int i = 0; i < row1; ++i){
         for(int j = 0; j <col2; j++){
-        struct element *temp = (struct element *)malloc(sizeof(struct element));
-            pthread_join(threads_2[count++],(void **)&temp);
-            res2[i][j] = temp->val;
+        temp[structCount] = (struct element *)malloc(sizeof(struct element));
+            pthread_join(threads_2[count++],(void **)&temp[structCount]);
+            res2[i][j] = temp[structCount++]->val;
         }
     }
     /*Writing resulting matrix to o/p file*/
@@ -155,6 +164,11 @@ int main(int argc, char *argv[])
     fprintf(output, "Number of threads: %d\n" , threadsNum);
     fprintf(output, "Seconds taken: %lu\n", stop_2.tv_sec - start_2.tv_sec);
     fprintf(output, "Microseconds taken: %lu\n", stop_2.tv_usec - start_2.tv_usec);
+    /*free memory allocation*/
+    for(int i = 0; i < threadsNum; ++i){
+        free(d[i]);
+        free(temp[i]);
+    }
     /*--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
     /*free memory allocation*/
     for(int i = 0; i < row1; ++i){
@@ -168,6 +182,11 @@ int main(int argc, char *argv[])
     fclose(output);
     return 0;
 }
+
+
+
+
+
 /*
 Method 1: compute each row in the output matrix.
 args: rowIndex, indicating the index of the row to be computed
